@@ -25,7 +25,7 @@
   --pn-1: #f472b6;
   --pn-2: #fbbf24;
   --pn-3: #4ade80;
-  --mono: "JetBrains Mono", "Cascadia Code", Consolas, "Courier New", monospace;
+  --mono: "JetBrains Mono", "SF Mono", "Cascadia Code", Menlo, Consolas, "Courier New", monospace;
   --sans: "Segoe UI", "PingFang SC", "Microsoft YaHei", -apple-system, sans-serif;
 }
 
@@ -320,7 +320,7 @@ a:hover { color: var(--accent-3); }
 }
 
 .article {
-  font-size: 16px;
+  font-size: 16.5px;
   color: var(--text);
   word-wrap: break-word;
 }
@@ -361,7 +361,7 @@ a:hover { color: var(--accent-3); }
 .article table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 14.5px;
+  font-size: 15px;
   overflow: hidden;
   border-radius: 10px;
   border: 1px solid var(--border);
@@ -369,7 +369,7 @@ a:hover { color: var(--accent-3); }
 
 .article th {
   font-family: var(--mono);
-  font-size: 13px;
+  font-size: 13.5px;
   text-align: left;
   padding: 10px 16px;
   background: var(--accent-dim);
@@ -436,11 +436,12 @@ a:hover { color: var(--accent-3); }
 .copy-btn.copied { color: #34d399; border-color: #34d399; }
 
 .code-block pre {
-  padding: 18px 20px;
+  padding: 20px 22px;
   overflow-x: auto;
   font-family: var(--mono);
-  font-size: 13.5px;
-  line-height: 1.7;
+  font-size: 15.5px;
+  line-height: 1.8;
+  letter-spacing: 0.2px;
   color: var(--text);
 }
 
