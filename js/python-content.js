@@ -1338,7 +1338,322 @@ print(obj["model"])             # seedance
 
 ---
 
-**恭喜,20 章核心语法全部通关!** 🎉 语法只是工具,接下来最好的学习方式是**动手做小项目**:写个记账脚本、爬个网页、调个 API。遇到不会的语法,随时翻回这一页查——这也是这份教程最好的用法。
+**核心语法到此全部通关!** 🎉 接下来是实战篇(第 21-24 章)——用一个真实的爬虫项目,把前面学的函数、字典、循环、异常处理、文件操作全部串起来用一遍。
+`,
+  },
+
+  {
+    id: "http",
+    title: "21. HTTP 入门:网页是怎么传输的",
+    content: `
+## 爬虫前先懂一点网络
+
+**作用**:爬虫的本质是"模拟浏览器向服务器要数据"。要理解爬虫,得先理解浏览器和服务器之间是怎么"对话"的——这套对话规则就叫 HTTP。
+
+**使用场景**:调试爬虫("为什么返回 403?")、看懂接口文档、调 API,都靠这几个基础概念。
+
+## 请求与响应:一问一答
+
+你在浏览器输入网址回车的瞬间,发生了一次"问答":
+
+- **请求(Request)**:浏览器问服务器——"请把首页给我"(顺便报上自己的身份)
+- **响应(Response)**:服务器答——"给你,状态 200,内容是 HTML"
+
+爬虫做的事,就是用代码发出同样的"问题",收下"答案",再从答案里挑出想要的数据。
+
+## URL 的结构
+
+\`\`\`text
+https://www.example.com:443/news/list?page=2&id=5
+└─┬─┘   └────┬────┘ └┬┘ └───┬───┘ └─────┬─────┘
+协议        域名      端口    路径      查询参数
+\`\`\`
+
+**查询参数**(\`?key=value&key=value\`)最重要——翻页、搜索、筛选通常就是改这里的数字。
+
+## 常见状态码:服务器的"回话暗号"
+
+| 状态码 | 含义 | 爬虫该怎么办 |
+|---|---|---|
+| \`200\` | 成功 | 正常解析内容 |
+| \`404\` | 页面不存在 | 检查 URL 是否拼错 |
+| \`403\` | 拒绝访问(常是识别出爬虫) | 补 User-Agent 请求头(下一章) |
+| \`429\` | 请求太频繁 | 加延时,放慢速度 |
+| \`500\` | 服务器内部错误 | 稍后重试 |
+
+## GET 与 POST
+
+**作用**:两种最常用的请求方式——GET 是"我要**看**数据"(参数在 URL 里),POST 是"我要**交**数据"(参数藏在请求体里)。
+
+**使用场景**:打开网页、翻页是 GET;登录、提交表单、搜索框提交通常是 POST。
+
+## 神器:F12 开发者工具
+
+**作用**:浏览器按 \`F12\` 打开开发者工具,**Network(网络)** 面板能看到浏览器发出的每一个请求和收到的每一个响应。
+
+**使用场景**:这是爬虫工程师的"显微镜"——看到的数据不在网页源码里?打开 Network 找找,十有八九是浏览器又发了个请求从接口拿的 JSON。选中某个请求,看 Headers(请求头)、Response(响应内容),信息全在里面。
+
+> 学习建议:随便打开一个网站,按 F12 → Network → 刷新页面,看看第一个请求返回的 HTML 长什么样——爬虫拿到的就是这份东西。
+`,
+  },
+
+  {
+    id: "requests",
+    title: "22. requests:发送 HTTP 请求",
+    content: `
+## requests 是什么
+
+**作用**:\`requests\` 是 Python 最流行的 HTTP 库,一行代码就能像浏览器一样向服务器要网页。
+
+**使用场景**:爬虫的第一步永远是它——先拿到网页的 HTML 源码,再交给下一章的解析工具处理。
+
+安装(终端里执行):
+
+\`\`\`bash
+pip install requests
+\`\`\`
+
+## 最简单的用法
+
+\`\`\`python
+import requests
+
+url = "https://www.example.com"
+r = requests.get(url, timeout=10)   # 发 GET 请求,10 秒超时(务必写!)
+
+print(r.status_code)   # 200 —— 状态码
+print(r.text)          # 网页源码(一大坨 HTML 字符串)
+\`\`\`
+
+**要点**:\`r\` 是响应对象,常用属性就三个——\`status_code\`(状态码)、\`text\`(文本内容)、\`content\`(二进制内容,下载图片用)。
+
+## 带上身份:请求头 User-Agent
+
+**作用**:每个请求都带着"自我介绍"(请求头),其中 \`User-Agent\` 表明"我是谁"——Python requests 默认报的名字会被很多网站一眼认出是爬虫,直接回 403 拒绝。
+
+**使用场景**:把自己伪装成普通浏览器,是爬虫的基本礼貌和通行证。
+
+\`\`\`python
+headers = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                  "AppleWebKit/537.36 (KHTML, like Gecko) "
+                  "Chrome/126.0.0.0 Safari/537.36"
+}
+r = requests.get(url, headers=headers, timeout=10)
+\`\`\`
+
+## 查询参数:params
+
+**作用**:把 \`?page=2&type=news\` 这样的查询参数写成字典,requests 帮你拼到 URL 上,不用手动拼字符串。
+
+\`\`\`python
+params = {"page": 2, "type": "news"}
+r = requests.get("https://www.example.com/list", params=params, headers=headers, timeout=10)
+print(r.url)   # https://www.example.com/list?page=2&type=news
+\`\`\`
+
+## 健壮的爬虫骨架(推荐背下来)
+
+**作用**:网络请求随时可能失败——超时、断网、服务器抽风。成熟的爬虫必须把这些都接住。
+
+\`\`\`python
+import requests
+
+def fetch(url):
+    """抓取网页,成功返回源码,失败返回 None"""
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
+    try:
+        r = requests.get(url, headers=headers, timeout=10)
+        r.raise_for_status()          # 状态码不是 2xx 就抛异常
+        r.encoding = r.apparent_encoding   # 自动探测编码,防中文乱码
+        return r.text
+    except requests.RequestException as e:
+        print(f"抓取失败 {url}: {e}")
+        return None
+
+html = fetch("https://www.example.com")
+\`\`\`
+
+这个骨架综合了前面学的**函数、字典、异常处理**——基础语法学得好不好,一眼就看出来。
+`,
+  },
+
+  {
+    id: "bs4",
+    title: "23. BeautifulSoup:解析与提取",
+    content: `
+## 为什么需要解析
+
+**作用**:上一章拿到的 HTML 是一大坨字符串,直接在字符串里找数据又脆又难看。BeautifulSoup 把 HTML 解析成"树状结构",让你像查字典一样按标签、属性精准取数据。
+
+**使用场景**:从网页里提取标题、正文、链接、价格、评论——爬虫的核心环节。
+
+安装:
+
+\`\`\`bash
+pip install beautifulsoup4
+\`\`\`
+
+## 基本用法
+
+\`\`\`python
+from bs4 import BeautifulSoup
+
+html = """
+<html>
+  <body>
+    <h1 class="title">今日新闻</h1>
+    <ul class="news-list">
+      <li><a href="/news/1">Python 3.13 发布</a></li>
+      <li><a href="/news/2">AI 视频新突破</a></li>
+    </ul>
+  </body>
+</html>
+"""
+
+soup = BeautifulSoup(html, "html.parser")   # 第二个参数指定解析器
+
+print(soup.title)        # <title>今日新闻</title> 之类:快速取某标签
+print(soup.h1.text)      # 今日新闻 —— .text 只要文字
+\`\`\`
+
+## find 与 find_all:按标签/属性查找
+
+**作用**:\`find()\` 找**第一个**符合条件的标签,\`find_all()\` 找**全部**,返回列表。
+
+\`\`\`python
+links = soup.find_all("a")            # 所有 <a> 标签
+first = soup.find("li")               # 第一个 <li>
+
+# 加条件:找 class 为 news-list 的 <ul>
+news_list = soup.find("ul", class_="news-list")
+# 注意是 class_(带下划线),因为 class 是 Python 关键字
+
+for a in news_list.find_all("a"):
+    print(a.text, a["href"])          # 文字 和 href 属性
+\`\`\`
+
+**提取三件套**:\`a.text\`(标签内文字)、\`a["href"]\` 或 \`a.get("href")\`(属性值,\`get\` 取不到不报错)、\`a.attrs\`(全部属性字典)。
+
+## CSS 选择器:select(更强大)
+
+**作用**:\`select()\` 支持 CSS 选择器语法——\`#\` 代表 id、\`.\` 代表 class、空格代表"里面的",和写网页样式用同一套规则。
+
+\`\`\`python
+# 选 class=news-list 里面的所有 a 标签
+for a in soup.select(".news-list a"):
+    print(a.get("href"))
+
+# 选 id=main 的元素里的 h2
+h2 = soup.select_one("#main h2")      # select_one 只取第一个
+\`\`\`
+
+## 相对链接补全:urljoin
+
+**作用**:爬到的链接常是 \`/news/1\` 这种"半截"相对路径,要拼上域名才是能访问的完整网址。\`urljoin\` 自动处理。
+
+\`\`\`python
+from urllib.parse import urljoin
+
+full = urljoin("https://www.example.com/news/list", "/news/1")
+print(full)    # https://www.example.com/news/1
+\`\`\`
+`,
+  },
+
+  {
+    id: "spider",
+    title: "24. 完整实战:爬虫小项目",
+    content: `
+## 项目目标
+
+把前三章的知识串成一个完整程序:**抓取一个(示意)新闻列表页 → 提取标题和链接 → 翻页 → 存成 CSV 文件**。这就是一个最典型也最实用的爬虫骨架,换成任何网站只需改解析部分。
+
+## 完整代码(逐段讲解)
+
+\`\`\`python
+import csv
+import time
+import requests
+from bs4 import BeautifulSoup
+from urllib.parse import urljoin
+
+BASE_URL = "https://www.example.com/news/list"
+
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                  "AppleWebKit/537.36 (KHTML, like Gecko) "
+                  "Chrome/126.0.0.0 Safari/537.36"
+}
+
+def fetch(url):
+    """第 22 章的骨架:抓网页,失败返回 None"""
+    try:
+        r = requests.get(url, headers=HEADERS, timeout=10)
+        r.raise_for_status()
+        r.encoding = r.apparent_encoding
+        return r.text
+    except requests.RequestException as e:
+        print(f"抓取失败 {url}: {e}")
+        return None
+
+def parse(html, page_url):
+    """第 23 章的解析:提取 (标题, 链接) 列表"""
+    soup = BeautifulSoup(html, "html.parser")
+    items = []
+    for a in soup.select(".news-list a"):          # 按实际网站改选择器
+        title = a.text.strip()
+        link = urljoin(page_url, a.get("href", ""))  # 相对链接补全
+        if title and link:
+            items.append({"title": title, "link": link})
+    return items
+
+def save(rows, filename="news.csv"):
+    """第 18 章的文件操作:存成 CSV,Excel 能直接打开"""
+    with open(filename, "w", newline="", encoding="utf-8-sig") as f:
+        writer = csv.DictWriter(f, fieldnames=["title", "link"])
+        writer.writeheader()
+        writer.writerows(rows)
+    print(f"已保存 {len(rows)} 条到 {filename}")
+
+def main():
+    all_items = []
+    for page in range(1, 4):                 # 爬 1~3 页
+        url = f"{BASE_URL}?page={page}"
+        print(f"正在抓取第 {page} 页...")
+        html = fetch(url)
+        if html:
+            all_items.extend(parse(html, url))
+        time.sleep(2)                        # 每页停 2 秒,礼貌爬取!
+    save(all_items)
+
+if __name__ == "__main__":                   # 第 19 章的知识点
+    main()
+\`\`\`
+
+**注意**:\`encoding="utf-8-sig"\` 是给 CSV 加 BOM 头——不加的话 Excel 打开中文会乱码。
+
+## 礼貌爬虫守则(重要)
+
+爬虫是工具,怎么用是素质。写爬虫前请记住:
+
+- **控制频率**:\`time.sleep()\` 加延时,别把人家服务器打挂——高频爬取等于攻击
+- **只取公开数据**:需要登录/付费才能看的内容不要爬
+- **看 robots.txt**:访问 \`网站/robots.txt\` 能看到站长允许/禁止爬哪些路径
+- **遵守法律和网站条款**:爬取的数据仅用于个人学习,不商用、不倒卖
+- **标注身份**:正经的爬虫会在 User-Agent 里留联系方式
+
+## 进阶方向
+
+学完这个骨架,想继续深入可以了解:
+
+- **动态页面**:数据靠 JavaScript 加载、源码里没有?F12 找到数据接口直接请求 JSON(比解析 HTML 更稳),或用 \`selenium\`/\`playwright\` 控制真浏览器
+- **框架**:\`scrapy\`——大型爬虫工程的标准武器
+- **存储升级**:存进 SQLite 数据库而不是 CSV
+
+---
+
+**全部 24 章完成!** 🎉 从 print 到爬虫项目,你已经具备独立写小工具的能力了。最好的下一步:找一个你真正感兴趣的网站(从 F12 开始),把这套骨架改造一遍。
 `,
   },
 ];
