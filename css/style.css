@@ -22,6 +22,9 @@
   --glow: 0 0 24px rgba(34, 211, 238, 0.15);
   --grid-line: rgba(148, 163, 184, 0.05);
   --nav-bg: rgba(7, 11, 20, 0.82);
+  --pn-1: #f472b6;
+  --pn-2: #fbbf24;
+  --pn-3: #4ade80;
   --mono: "JetBrains Mono", "Cascadia Code", Consolas, "Courier New", monospace;
   --sans: "Segoe UI", "PingFang SC", "Microsoft YaHei", -apple-system, sans-serif;
 }
@@ -45,6 +48,9 @@
   --glow: 0 0 24px rgba(8, 145, 178, 0.1);
   --grid-line: rgba(15, 23, 42, 0.04);
   --nav-bg: rgba(245, 247, 251, 0.85);
+  --pn-1: #db2777;
+  --pn-2: #b45309;
+  --pn-3: #15803d;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -437,6 +443,11 @@ a:hover { color: var(--accent-3); }
   line-height: 1.7;
   color: var(--text);
 }
+
+/* 彩虹括号: 按嵌套深度循环着色 */
+.code-block code .pn-1 { color: var(--pn-1); }
+.code-block code .pn-2 { color: var(--pn-2); }
+.code-block code .pn-3 { color: var(--pn-3); }
 
 /* 上下篇导航 */
 .post-nav {

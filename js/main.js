@@ -50,6 +50,25 @@
     return `${y} 年 ${+m} 月 ${+d} 日`;
   }
 
+  /* 括号按嵌套深度着色(内层/外层不同色),便于分辨公式与代码的层次 */
+  function colorizeDelims(raw) {
+    let depth = 0;
+    let out = "";
+    for (const ch of raw) {
+      const c = ch === "&" ? "&amp;" : ch === "<" ? "&lt;" : ch === ">" ? "&gt;" : ch;
+      if (ch === "(" || ch === "[" || ch === "{") {
+        depth += 1;
+        out += `<span class="pn-${((depth - 1) % 3) + 1}">${c}</span>`;
+      } else if (ch === ")" || ch === "]" || ch === "}") {
+        out += `<span class="pn-${((depth - 1) % 3) + 1}">${c}</span>`;
+        depth = Math.max(0, depth - 1);
+      } else {
+        out += c;
+      }
+    }
+    return out;
+  }
+
   /* ---------- 轻量 Markdown 渲染器 ---------- */
   function renderMarkdown(src) {
     // 1. 先抽出代码块占位,避免内部内容被其他规则处理
@@ -117,7 +136,7 @@
         `<div class="code-block"><div class="code-head">` +
         `<span>${b.lang}</span>` +
         `<button class="copy-btn" type="button">复制</button>` +
-        `</div><pre><code>${b.code}</code></pre></div>`
+        `</div><pre><code>${colorizeDelims(b.code)}</code></pre></div>`
       );
     });
   }
