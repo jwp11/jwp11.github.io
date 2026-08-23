@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="个人博客 · 记录硬件设计与编程学习">
+  <title>我的博客</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2322d3ee'/><text x='50' y='68' font-size='52' text-anchor='middle' fill='%23070b14' font-family='monospace' font-weight='bold'>&lt;/&gt;</text></svg>">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- 导航 -->
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a class="logo" href="index.html">
+        <span class="logo-mark">&lt;/&gt;</span>
+        <span>DEV.LOG</span>
+      </a>
+      <div class="nav-links">
+        <a class="nav-link active" href="index.html">首页</a>
+        <a class="nav-link" href="python.html">Python 教程</a>
+        <button class="theme-btn" id="themeToggle" type="button" title="切换明暗主题">🌙</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <header class="hero container">
+    <span class="hero-emoji fade-up">🛠️</span>
+    <h1 class="hero-title fade-up">
+      你好,我是 <span class="grad">JWP</span>
+    </h1>
+    <p class="hero-sub fade-up" id="heroSub">
+      <span class="typed"></span><span class="cursor"></span>
+    </p>
+  </header>
+
+  <!-- Python 教程推广卡片 -->
+  <div class="container" style="padding: 0 24px 10px;">
+    <a class="py-promo fade-up" href="python.html">
+      <span class="py-promo-icon">🐍</span>
+      <div>
+        <div class="py-promo-title">Python 语法完整教程 <span class="py-promo-badge">20 章 · 带进度追踪</span></div>
+        <div class="py-promo-desc">从变量、循环一路讲到装饰器、生成器与面向对象,每章带可运行示例,学完掌握全部核心语法</div>
+      </div>
+      <span class="py-promo-arrow">→</span>
+    </a>
+  </div>
+
+  <!-- 文章列表 -->
+  <main class="section container">
+    <div class="section-head">最新文章</div>
+    <div class="post-list" id="postList"></div>
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="footer">
+    <div class="container">
+      © 2026 JWP · Powered by <span class="heart">❤</span> and 纯 HTML/CSS/JS
+    </div>
+  </footer>
+
+  <script src="js/posts.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>文章 · 我的博客</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%2322d3ee'/><text x='50' y='68' font-size='52' text-anchor='middle' fill='%23070b14' font-family='monospace' font-weight='bold'>&lt;/&gt;</text></svg>">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- 导航 -->
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a class="logo" href="index.html">
+        <span class="logo-mark">&lt;/&gt;</span>
+        <span>DEV.LOG</span>
+      </a>
+      <div class="nav-links">
+        <a class="nav-link" href="index.html">首页</a>
+        <a class="nav-link" href="python.html">Python 教程</a>
+        <button class="theme-btn" id="themeToggle" type="button" title="切换明暗主题">🌙</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 文章 -->
+  <main class="post-page container">
+    <a class="back-link" href="index.html">← 返回首页</a>
+    <header id="postHeader"></header>
+    <article class="article" id="articleBody"></article>
+    <nav class="post-nav" id="postNav"></nav>
+  </main>
+
+  <!-- 页脚 -->
+  <footer class="footer">
+    <div class="container">
+      © 2026 JWP · Powered by <span class="heart">❤</span> and 纯 HTML/CSS/JS
+    </div>
+  </footer>
+
+  <script src="js/posts.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
