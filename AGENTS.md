@@ -11,13 +11,19 @@
 ├── index.html        首页(导航 + Hero + 教程推广卡片 + 文章列表)
 ├── post.html         文章详情页(靠 ?id= 参数区分文章)
 ├── python.html       Python 语法教程页(24 章,左侧目录 + 进度追踪)
+├── tspi-camera.html  泰山派 RK3566 运动相机实战页(12 节,同款目录 + 进度追踪)
 ├── css/style.css     全部样式:CSS 变量主题系统([data-theme] 切换明暗)
 ├── js/main.js        核心引擎:主题切换、轻量 Markdown 渲染器(BlogMD)、列表/文章渲染
 ├── js/posts.js       博客文章数据(POSTS 数组)★ 写文章改这里
 ├── js/python-content.js  教程章节数据(PY_CHAPTERS 数组)★ 加教程章节改这里
-├── js/python.js      教程页逻辑(目录/滚动高亮/进度存 localStorage)
+├── js/python.js      教程页逻辑(目录/滚动高亮/进度存 localStorage 的 python-progress)
+├── js/tspi-camera-content.js  相机实战章节数据(TSPI_CHAPTERS 数组)★ 加章节改这里
+├── js/tspi-camera.js 相机实战页逻辑(同 python.js,进度独立存 tspi-progress)
 └── serve.mjs         本地预览服务器(可选):node serve.mjs [端口,默认 8137]
 ```
+
+> 两个教程页(python.html / tspi-camera.html)共用同一套版式类:`py-layout` / `toc-*` / `chapter` / `ch-*`。
+> 要再开一个模块页,直接复制 `tspi-camera.html` + `js/tspi-camera.js`,改 TOC 文案、章节数据变量名、进度 localStorage 键、导航栏链接即可。
 
 ## 常见任务怎么做
 
@@ -42,6 +48,32 @@
 注意:首页 `index.html` 推广卡片上写死的"24 章"字样需要同步更新。
 学习进度存 localStorage 的 `python-progress`(键为章节 id),改 id 会让老用户进度丢失,**已发布章节的 id 不要改**。
 
+### 新增相机实战章节
+编辑 `js/tspi-camera-content.js`,在 TSPI_CHAPTERS 末尾追加:
+```js
+{ id: "唯一英文id", title: "13. 章节标题", content: `章节内容` }
+```
+首页 `index.html` 相机卡片上写死的"12 节"字样需要同步更新;进度存 `tspi-progress`,同样**已发布章节的 id 不要改**。
+
+该模块的定位是**实战踩坑手册**,每节按「现象 → 原因 → 命令/代码 → 验证」组织,配现象/原因/解决对照表,**不要写成纯原理讲解**。内容主题是泰山派 RK3566(无 eMMC、SD 卡启动)+ OV8858 摄像头的真实调试过程。
+
+### 页头控件(主题 / 内容宽度)
+两套控件都在 `js/main.js`(Theme / Width 模块),状态存 localStorage、以属性形式写到 `<html>` 上:
+
+| 控件 | 属性 | localStorage 键 | 取值 |
+|---|---|---|---|
+| 主题 | `data-theme` | `blog-theme` | `dark` / `light` |
+| 内容宽度 | `data-width` | `blog-width` | `standard`(960px) / `wide`(1200px) / `xwide`(1440px) |
+
+宽度靠 CSS 变量 `--content-max` 生效(`css/style.css` 顶部定义 `:root`,`.container` 使用它;档位选择器紧跟主题变量块)。
+要改默认宽度,把 `Width.get()` 的兜底值从 `"standard"` 改成想要的档位即可。
+
+**新增页面时必须把这两个按钮一起放进导航**,否则该页没有控件(JS 找不到元素会静默跳过,不报错):
+```html
+<button class="width-btn" id="widthToggle" type="button" title="内容宽度">标准</button>
+<button class="theme-btn" id="themeToggle" type="button" title="切换明暗主题">🌙</button>
+```
+
 ## Markdown-lite 语法(渲染器支持的全部)
 
 `# ## ###` 标题 | `**粗体**` | `*斜体*` | `` `行内代码` `` | 三反引号代码块(可标语言)|
@@ -59,6 +91,7 @@
 
 ```bash
 node --check js/posts.js && node --check js/python-content.js && node --check js/main.js
+node --check js/tspi-camera-content.js && node --check js/tspi-camera.js
 node serve.mjs            # 起本地预览 → 浏览器开 http://localhost:8137 检查
 ```
 有浏览器自动化能力时,抽检:页面无 JS 报错、新内容渲染出来、移动端 390px 视口无横向溢出(scrollWidth == clientWidth)。

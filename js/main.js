@@ -31,6 +31,37 @@
     },
   };
 
+  /* ---------- 内容宽度管理 ---------- */
+  const Width = {
+    key: "blog-width",
+    levels: ["standard", "wide", "xwide"],
+    labels: { standard: "标准", wide: "宽屏", xwide: "超宽" },
+    tips: { standard: "960px", wide: "1200px", xwide: "1440px" },
+    get() {
+      const saved = localStorage.getItem(this.key);
+      return this.levels.includes(saved) ? saved : "standard";
+    },
+    apply(w) {
+      document.documentElement.setAttribute("data-width", w);
+      const btn = document.getElementById("widthToggle");
+      if (btn) {
+        btn.textContent = this.labels[w];
+        btn.title = `内容宽度:${this.labels[w]}(${this.tips[w]})· 点击切换`;
+      }
+    },
+    cycle() {
+      const cur = this.levels.indexOf(this.get());
+      const next = this.levels[(cur + 1) % this.levels.length];
+      localStorage.setItem(this.key, next);
+      this.apply(next);
+    },
+    init() {
+      this.apply(this.get());
+      const btn = document.getElementById("widthToggle");
+      if (btn) btn.addEventListener("click", () => this.cycle());
+    },
+  };
+
   /* ---------- 工具 ---------- */
   const $ = (sel) => document.querySelector(sel);
 
@@ -248,6 +279,7 @@
   /* ---------- 启动 ---------- */
   document.addEventListener("DOMContentLoaded", () => {
     Theme.init();
+    Width.init();
     renderIndex();
     renderPost();
     typewriter($("#heroSub"), [

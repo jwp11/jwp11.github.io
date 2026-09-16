@@ -17,6 +17,7 @@
   --accent-2: #818cf8;
   --accent-3: #c084fc;
   --accent-dim: rgba(34, 211, 238, 0.12);
+  --accent-2-dim: rgba(129, 140, 248, 0.12);
   --code-bg: #0d1117;
   --shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
   --glow: 0 0 24px rgba(34, 211, 238, 0.15);
@@ -27,6 +28,8 @@
   --pn-3: #4ade80;
   --mono: "JetBrains Mono", "SF Mono", "Cascadia Code", Menlo, Consolas, "Courier New", monospace;
   --sans: "Segoe UI", "PingFang SC", "Microsoft YaHei", -apple-system, sans-serif;
+  /* 内容最大宽度:由 js/main.js 的 Width 模块切换 <html data-width> */
+  --content-max: 960px;
 }
 
 [data-theme="light"] {
@@ -43,6 +46,7 @@
   --accent-2: #6366f1;
   --accent-3: #9333ea;
   --accent-dim: rgba(8, 145, 178, 0.1);
+  --accent-2-dim: rgba(99, 102, 241, 0.1);
   --code-bg: #f1f5f9;
   --shadow: 0 8px 32px rgba(15, 23, 42, 0.1);
   --glow: 0 0 24px rgba(8, 145, 178, 0.1);
@@ -52,6 +56,10 @@
   --pn-2: #b45309;
   --pn-3: #15803d;
 }
+
+/* 内容宽度档位(标准 / 宽屏 / 超宽),由 js/main.js 的 Width 模块写到 <html data-width> */
+[data-width="wide"] { --content-max: 1200px; }
+[data-width="xwide"] { --content-max: 1440px; }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -77,7 +85,7 @@ a:hover { color: var(--accent-3); }
 
 ::selection { background: var(--accent); color: var(--bg); }
 
-.container { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+.container { max-width: var(--content-max); margin: 0 auto; padding: 0 24px; }
 
 /* ============ 导航栏 ============ */
 .nav {
@@ -154,6 +162,30 @@ a:hover { color: var(--accent-3); }
   color: var(--accent);
   box-shadow: var(--glow);
   transform: rotate(15deg);
+}
+
+/* 内容宽度切换按钮 */
+.width-btn {
+  height: 38px;
+  padding: 0 11px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--card);
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.25s;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.width-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: var(--glow);
 }
 
 /* ============ 首页 Hero ============ */
@@ -512,6 +544,10 @@ a:hover { color: var(--accent-3); }
   .post-nav-card.next { text-align: left; }
   .article { font-size: 15px; }
   .nav-link { padding: 7px 10px; font-size: 14px; }
+  /* 窄屏:导航允许换行,避免链接 + 主题 + 宽度按钮挤到横向溢出 */
+  .nav-inner { flex-wrap: wrap; height: auto; min-height: 64px; padding: 10px 0; row-gap: 8px; }
+  .nav-links { flex-wrap: wrap; justify-content: flex-end; }
+  .width-btn { height: 34px; padding: 0 9px; font-size: 12px; }
 }
 
 /* ============================================
@@ -678,8 +714,9 @@ a:hover { color: var(--accent-3); }
   .chapter { padding: 24px 20px; }
 }
 
-/* 首页教程推广卡片 */
-.py-promo {
+/* 首页推广卡片(教程 / 相机实战共用版式) */
+.py-promo,
+.cam-promo {
   display: flex;
   align-items: center;
   gap: 18px;
@@ -691,18 +728,22 @@ a:hover { color: var(--accent-3); }
   transition: all 0.25s;
 }
 
-.py-promo:hover {
+.py-promo:hover,
+.cam-promo:hover {
   border-color: var(--accent);
   transform: translateY(-3px);
   box-shadow: var(--shadow), var(--glow);
   color: var(--text);
 }
 
-.py-promo-icon { font-size: 34px; flex: none; }
+.py-promo-icon,
+.cam-promo-icon { font-size: 34px; flex: none; }
 
-.py-promo-title { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+.py-promo-title,
+.cam-promo-title { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
 
-.py-promo-badge {
+.py-promo-badge,
+.cam-promo-badge {
   font-family: var(--mono);
   font-size: 11px;
   font-weight: 400;
@@ -714,9 +755,11 @@ a:hover { color: var(--accent-3); }
   vertical-align: 2px;
 }
 
-.py-promo-desc { font-size: 13.5px; color: var(--text-dim); }
+.py-promo-desc,
+.cam-promo-desc { font-size: 13.5px; color: var(--text-dim); }
 
-.py-promo-arrow {
+.py-promo-arrow,
+.cam-promo-arrow {
   margin-left: auto;
   font-size: 22px;
   color: var(--accent);
@@ -724,11 +767,23 @@ a:hover { color: var(--accent-3); }
   transition: transform 0.25s;
 }
 
-.py-promo:hover .py-promo-arrow { transform: translateX(6px); }
+.py-promo:hover .py-promo-arrow,
+.cam-promo:hover .cam-promo-arrow { transform: translateX(6px); }
+
+/* 相机实战卡片:换成靛紫强调色,与教程卡片区分 */
+.cam-promo {
+  background: linear-gradient(135deg, var(--accent-2-dim), transparent 60%), var(--card);
+}
+
+.cam-promo:hover { border-color: var(--accent-2); }
+.cam-promo-badge { color: var(--accent-2); background: var(--accent-2-dim); }
+.cam-promo-arrow { color: var(--accent-2); }
 
 @media (max-width: 720px) {
-  .py-promo { flex-direction: column; align-items: flex-start; gap: 10px; }
-  .py-promo-arrow { display: none; }
+  .py-promo,
+  .cam-promo { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .py-promo-arrow,
+  .cam-promo-arrow { display: none; }
 }
 
 

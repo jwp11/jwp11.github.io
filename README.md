@@ -9,6 +9,7 @@
 - 🏠 首页:文章列表
 - 📝 博客文章:见 `js/posts.js`
 - 🐍 Python 语法完整教程(24 章,含爬虫实战篇):`python.html`
+- 📷 泰山派 RK3566 运动相机实战(12 节,踩坑手册):`tspi-camera.html`
 
 ## 本地预览
 
