@@ -1,0 +1,36 @@
+name: Update posts index
+
+# 当 posts/ 下有 Markdown 变动时,重新生成 posts/index.json
+# (这样用 Pages CMS 在网页上发文后,首页列表会自动收录)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "posts/**"
+      - "scripts/gen-posts-index.mjs"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-index:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Regenerate posts/index.json
+        run: node scripts/gen-posts-index.mjs
+
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [ -n "$(git status --porcelain posts/index.json)" ]; then
+            git add posts/index.json
+            git commit -m "chore(posts): 自动更新文章索引 index.json"
+            git push
+          else
+            echo "index.json 无变化,跳过提交"
+          fi

@@ -1,0 +1,49 @@
+# Pages CMS 配置(https://pagescms.org)
+# 登录 app.pagescms.org → 用 GitHub 授权 → 选本仓库 → 即可在网页表单里写文章
+
+media:
+  - name: images
+    label: 图片
+    input: images
+    output: /images
+    rename: safe
+    categories: [image]
+
+content:
+  - name: posts
+    label: 博客文章
+    type: collection
+    path: posts
+    format: yaml-frontmatter
+    filename:
+      template: "{fields.id}.md"
+    exclude: [index.json]
+    view:
+      primary: title
+      sort: date
+      order: desc
+    fields:
+      - name: id
+        label: 网址短名(英文/数字,如 my-first-post)
+        type: string
+        required: true
+      - name: title
+        label: 标题
+        type: string
+        required: true
+      - name: date
+        label: 日期
+        type: date
+        required: true
+      - name: tags
+        label: 标签(回车添加)
+        type: string
+        list: true
+      - name: summary
+        label: 摘要(显示在首页卡片)
+        type: text
+        required: true
+      - name: body
+        label: 正文
+        type: rich-text
+        required: true

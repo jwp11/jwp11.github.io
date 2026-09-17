@@ -212,7 +212,7 @@
   }
 
   /* ---------- 首页:文章列表 ---------- */
-  function renderIndex() {
+  function renderIndex(POSTS) {
     const list = $("#postList");
     if (!list) return;
     const sorted = [...POSTS].sort((a, b) => b.date.localeCompare(a.date));
@@ -229,7 +229,7 @@
   }
 
   /* ---------- 文章页 ---------- */
-  function renderPost() {
+  function renderPost(POSTS) {
     const header = $("#postHeader");
     if (!header) return;
     const id = new URLSearchParams(location.search).get("id");
@@ -277,16 +277,32 @@
   }
 
   /* ---------- 启动 ---------- */
-  document.addEventListener("DOMContentLoaded", () => {
+  document.addEventListener("DOMContentLoaded", async () => {
     Theme.init();
     Width.init();
-    renderIndex();
-    renderPost();
     typewriter($("#heroSub"), [
       "code / hardware / life",
       "记录硬件设计与编程学习",
       "保持好奇,持续构建",
     ]);
+
+    // 文章改为 Markdown 文件,异步加载(posts/index.json -> posts/*.md)
+    let posts = [];
+    try {
+      posts = await window.BlogPosts.load();
+    } catch (e) {
+      const list = $("#postList");
+      if (list) {
+        list.innerHTML =
+          `<div class="post-empty">文章加载失败:${escapeHtml(e && e.message ? e.message : String(e))}` +
+          `<br>本地预览请用 <code>node serve.mjs</code>(不要直接双击 html 文件)</div>`;
+      }
+      const header = $("#postHeader");
+      if (header) header.innerHTML = `<div class="not-found"><h1>加载失败</h1><p>${escapeHtml(e && e.message ? e.message : String(e))}</p></div>`;
+      return;
+    }
+    renderIndex(posts);
+    renderPost(posts);
   });
 
   // 暴露给其他页面(python.html 等)复用

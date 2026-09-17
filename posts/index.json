@@ -1,0 +1,38 @@
+[
+  {
+    "id": "rk3566-camera-isp-h264-pipeline",
+    "file": "rk3566-camera-isp-h264-pipeline.md",
+    "date": "2026-09-17",
+    "title": "从 Sensor 到屏幕:泰山派 RK3566 摄像头 → ISP → 硬件 H.264 → 推流 → 解码显示的完整链路"
+  },
+  {
+    "id": "lvgl-render-pipeline",
+    "file": "lvgl-render-pipeline.md",
+    "date": "2026-08-31",
+    "title": "LVGL 学习笔记(一):从三要素到双缓冲,搞懂屏幕是怎么亮起来的"
+  },
+  {
+    "id": "esp32-devboard",
+    "file": "esp32-devboard.md",
+    "date": "2026-08-23",
+    "title": "ESP32-S3 开发板入门:从零画一块自己的开发板"
+  },
+  {
+    "id": "riemann-zeta-continuation",
+    "file": "riemann-zeta-continuation.md",
+    "date": "2026-08-23",
+    "title": "黎曼 ζ 函数的解析延拓步骤:从级数到亲手求出非平凡零点"
+  },
+  {
+    "id": "python-notes-kwargs",
+    "file": "python-notes-kwargs.md",
+    "date": "2026-08-22",
+    "title": "Python 学习笔记:从一个 headers 字典到 **kwargs"
+  },
+  {
+    "id": "ai-video-overview",
+    "file": "ai-video-overview.md",
+    "date": "2026-08-20",
+    "title": "AI 视频生成初探:Seedance 和它的对手们"
+  }
+]
