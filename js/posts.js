@@ -146,6 +146,11 @@
     return posts.slice().sort((a, b) => String(b.date).localeCompare(String(a.date)));
   }
 
+  // 用于判断"后台刷新拿到的数据是否和当前展示的不一样"
+  function signature(posts) {
+    return posts.map((p) => p.id + "|" + p.date + "|" + p.title + "|" + p.content.length).join("\n");
+  }
+
   /* ---------- 缓存 ---------- */
   function readCache() {
     if (!store) return null;
@@ -159,24 +164,34 @@
     try { store.setItem(CACHE_KEY, JSON.stringify({ t: Date.now(), posts: posts })); } catch (e) {}
   }
 
-  /* ---------- 对外:load() ---------- */
-  async function load() {
-    const cached = readCache();
-    if (cached && Date.now() - cached.t < CACHE_TTL) return sortPosts(cached.posts);
-    let posts = null;
+  // 真正去拉最新数据(优先 index.json,失败退回 GitHub API)
+  async function fetchFresh() {
     try {
-      posts = await loadFromIndex();
+      return sortPosts(await loadFromIndex());
     } catch (e1) {
-      try {
-        posts = await loadFromApi();
-      } catch (e2) {
-        if (cached) return sortPosts(cached.posts); // 网络失败,退回旧缓存
-        throw e2;
-      }
+      return sortPosts(await loadFromApi());
     }
-    posts = sortPosts(posts);
-    writeCache(posts);
-    return posts;
+  }
+
+  /* ---------- 对外:load(onUpdate) ----------
+     有缓存时:立刻返回缓存(秒开),同时后台拉最新;若内容有变化,调用 onUpdate(新数据) 让页面重渲染。
+     没缓存时:等拉到数据再返回。 */
+  async function load(onUpdate) {
+    const cached = readCache();
+    if (cached && Date.now() - cached.t < CACHE_TTL) {
+      fetchFresh()
+        .then((fresh) => {
+          writeCache(fresh);
+          if (typeof onUpdate === "function" && signature(fresh) !== signature(cached.posts)) {
+            onUpdate(fresh);
+          }
+        })
+        .catch(() => {}); // 后台刷新失败无所谓,继续用缓存
+      return sortPosts(cached.posts);
+    }
+    const fresh = await fetchFresh();
+    writeCache(fresh);
+    return fresh;
   }
 
   root.BlogPosts = { load: load, parseFrontmatter: parseFrontmatter };

@@ -287,9 +287,11 @@
     ]);
 
     // 文章改为 Markdown 文件,异步加载(posts/index.json -> posts/*.md)
+    // 有缓存时先秒开,后台自动拉最新,有变化再重渲染(刚发布的文章刷新就能看到)
+    const rerender = (updated) => { renderIndex(updated); renderPost(updated); };
     let posts = [];
     try {
-      posts = await window.BlogPosts.load();
+      posts = await window.BlogPosts.load(rerender);
     } catch (e) {
       const list = $("#postList");
       if (list) {
@@ -301,8 +303,7 @@
       if (header) header.innerHTML = `<div class="not-found"><h1>加载失败</h1><p>${escapeHtml(e && e.message ? e.message : String(e))}</p></div>`;
       return;
     }
-    renderIndex(posts);
-    renderPost(posts);
+    rerender(posts);
   });
 
   // 暴露给其他页面(python.html 等)复用
