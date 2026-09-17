@@ -1,5 +1,11 @@
 [
   {
+    "id": "my-linux-learning-notes",
+    "file": "my-linux-learning-notes.md",
+    "date": "2026-09-17",
+    "title": "linux sdk源码介绍笔记"
+  },
+  {
     "id": "rk3566-camera-isp-h264-pipeline",
     "file": "rk3566-camera-isp-h264-pipeline.md",
     "date": "2026-09-17",
