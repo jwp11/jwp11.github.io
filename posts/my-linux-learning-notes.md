@@ -4,6 +4,7 @@ title: linux sdk源码介绍笔记
 date: 2026-09-17
 tags:
   - rk3566
+  - sdk
 summary: blbl linux内核笔记 学习
 ---
 # linux sdk 源码学习笔记
